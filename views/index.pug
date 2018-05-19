@@ -1,0 +1,238 @@
+doctype html
+html(lang='en')
+    head
+        meta(charset='UTF-8')
+        title To Do List
+        link(rel='stylesheet', href='https://use.fontawesome.com/releases/v5.0.13/css/all.css', integrity='sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp', crossorigin='anonymous')
+        link(rel='stylesheet', href='font-awesome-4.7.0/css/font-awesome.min.css')
+        link(rel='stylesheet', href='main.css')
+        link(rel='icon', href='favicon-96x96.png')
+        style.
+            @font-face {
+                font-family: Oxygen;
+                src: url(fonts/Oxygen-Regular.ttf); }
+            html {
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                height: auto;
+                font-family: Oxygen, sans-serif; }
+            html body {
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                height: auto; }
+            html body input {
+                font-family: Oxygen, sans-serif; }
+            html body .add-list-box {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center; }
+            html body .add-list-box .add-list-input-box {
+                display: flex;
+                flex-direction: row; }
+            html body .add-list-box .clear-button {
+                background: RED;
+                background-image: -webkit-linear-gradient(top, RED, RED);
+                background-image: -moz-linear-gradient(top, RED, RED);
+                background-image: -ms-linear-gradient(top, RED, RED);
+                background-image: -o-linear-gradient(top, RED, RED);
+                background-image: linear-gradient(to bottom, RED, RED);
+                -webkit-border-radius: 28px;
+                -moz-border-radius: 28px;
+                border-radius: 28px;
+                color: WHITE;
+                font-size: 15px;
+                padding: 10px 20px 10px 20px;
+                text-decoration: none;
+                margin-top: 20px; }
+            html body .add-list-box .clear-button:hover {
+                background: WHITE;
+                color: red;
+                background-image: -webkit-linear-gradient(top, WHITE, WHITE);
+                background-image: -moz-linear-gradient(top, WHITE, WHITE);
+                background-image: -ms-linear-gradient(top, WHITE, WHITE);
+                background-image: -o-linear-gradient(top, WHITE, WHITE);
+                background-image: linear-gradient(to bottom, WHITE, WHITE);
+                text-decoration: none; }
+            html body .add-list-box #list-name {
+                width: 250px;
+                font-size: 20px;
+                padding-left: 5px; }
+            html body .add-list-box .plus {
+                margin-left: 5px; }
+            html body .task-item-box {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                align-content: center; }
+            html body .task-item-box .task-item {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center; }
+            html body .task-item-box .checked > .list-task {
+                color: red;
+                text-decoration: line-through; }
+            html body .task-item-box .date-stamp {
+                margin-top: -10px; }
+            html body #list-content .list-title {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center; }
+            .list-task {
+                border: none;
+                text-align: center;
+                font-size: 20px; }
+            .task-delete {
+                font-size: 20px; }
+            /*# sourceMappingURL=main.css.map */
+    body
+        .add-list-box
+            .add-list-input-box
+                input#list-name(title='task-name', type='text', placeholder='Add List')
+                i#addlist.fa.fa-plus-circle.fa-2x.plus(aria-hidden='true')
+            div
+                button.clear-button(onclick='clearCompleted();') CLEAR COMPLETED
+        #list-content
+        script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
+        script.
+            function addTask(todocontainerId) {
+                var taskName = $('#task-name').val();
+                var task =
+                    '<div class="list-item">' +
+                    '<input type="checkbox" class="check-box" "title="checkbox">' +
+                    '<p class="list-task">' + taskName + '</p>' +
+                    '<p class="task-delete" onclick="deleteTask(this);">&#10006;</p>' +
+                    '</div>';
+                if (taskName !== '') {
+                    var temp = $('#' + todocontainerId);
+                    //.append(task);
+                    console.log(temp);
+                }
+            }
+            function addList() {
+                var listName = $('#list-name').val().toString();
+                var list =
+                    '<div id="' + listName + '" class="list-title">' +
+                    '<h3 class="to-do-list-title">' + listName + '</h3>' +
+                    '<p class="task-delete" onclick="deleteTask(this);">&#10006;</p>' +
+                    '<input title="task-name" type="text" id="task-name" placeholder="Add Task">' +
+                    '<i class="fa fa-plus-circle fa-2x plus" id="addtask" aria-hidden="true" onclick="addTask(\\''+listName+ 'todocontainer\')"></i>' +
+                '<div id=" '+ listName+'todocontainer"></div>'+
+                '</div>';
+                if (listName !== '') {
+                    $('#list-content').append(list);
+                }
+            }
+            $(function () {
+                $('.check-box').click(function () {
+                    alert('hello');
+                })
+            });
+            $(function () {
+                $('.hide').click(function () {
+                    for (var i = 0; i<listIds.length; i++){
+                        $('#' + listIds[i]).hide();
+                    }
+                })
+            });
+            var checkboxID = 0;
+            var numberChecked = 0;
+            var clearButton = $('.clear-button');
+            clearButton.hide();
+            function addTask(todocontainerId, taskNameId){
+                var month = new Date().getMonth()+1;
+                var day = new Date().getDate();
+                var year = new Date().getFullYear();
+                var dateStamp = 'Created ' + month + '/' + day +'/' + year;
+                var taskName = $('#'+taskNameId).val();
+                var task =
+                    '<div class="task-item-box">'+
+                    '<div class="task-item">' +
+                    '<input type="checkbox" class="check-box" title="checkbox" id="cb'+checkboxID+'" onchange="ifChecked(' + checkboxID + ');">' +
+                    '<input class="list-task" type="text" value="'+taskName+'"">'  +
+                    '<p class="task-delete" onclick="deleteTask(this);" title="Delete">&#10006;</p>' +
+                    '</div>'+
+                    '<p class="date-stamp">'+dateStamp+'</p>'+
+                    '</div>';
+                if (taskName !== '') {
+                    /*var temp = $('#' + todocontainerId);
+                    //.append(task);*/
+                    $('#' + todocontainerId).append(task);
+                }
+                checkboxID ++;
+            }
+            function ifChecked(id) {
+                var ifChecked = $('#cb' + id);
+                if (ifChecked.is(':checked')){
+                    ifChecked.parent().addClass('checked');
+                    numberChecked +=1;
+                }
+                else {
+                    ifChecked.parent().removeClass('checked');
+                    numberChecked -=1
+                }
+                if(numberChecked >= 2){
+                    clearButton.show();
+                }
+                else {
+                    clearButton.hide();
+                }
+            }
+            function clearCompleted() {
+                $('.checked').parent().fadeOut(1000);
+                if(numberChecked - numberChecked >= 2){
+                    clearButton.show();
+                }
+                else {
+                    clearButton.hide();
+                    numberChecked = 0;
+                }
+            }
+            function addList() {
+                var listName = $('#list-name').val().toString();
+                var listNameNoSpace = listName.replace(/\\s+/g, '');
+                var taskName = listNameNoSpace + 'task-name';
+                var list =
+                    '<div id="' + listName + '" class="list-title">' +
+                    '<h2 class="to-do-list-title">' + listName.toUpperCase() + '</h2>' +
+                    '<input title="task-name" type="text" id="'+taskName+'" class="add-task-input" placeholder="Add Task">' +
+                    '<i class="fa fa-plus-circle fa-2x plus" id="addtask" aria-hidden="true" onclick="addTask(\\''+listNameNoSpace+ 'todocontainer\', \''+taskName+'\')"></i>' +
+                '<p class="task-delete" onclick="deleteList(this, \\''+listNameNoSpace+'todocontainer\');" title="Delete">&#10006;</p>' +
+                '</div>'+
+                '<div id="'+listNameNoSpace+'todocontainer"></div>';
+                if (listName !== '') {
+                    $('#list-content').append(list);
+                }
+            }
+            $(function () {
+                $('#addlist').click(function () {
+                    addList();
+                });
+                $('#list-name').keyup(function (event) {
+                    if (event.keyCode === 13){
+                        addList();
+                    }
+                })
+            });
+            $(function () {
+                $('#addtask').click(function () {
+                    addTask();
+                });
+                $('.add-task-input').keyup(function (event) {
+                    if (event.keyCode === 13){
+                        addTask();
+                    }
+                })
+            });
+            function deleteList(element,todocontainerId) {
+                $(element).parent().fadeOut(1000);
+                $('#'+ todocontainerId).fadeOut(1000);
+            }
+            function deleteTask(element,todocontainerId) {
+                $(element).parent().parent().fadeOut(1000);
+            }
