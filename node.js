@@ -62,7 +62,7 @@ app.get('/loggedIn', passport.authenticate('google', {
 }));
 
 app.get('/login',
-    passport.authenticate('google', { scope: ['profile']});
+    passport.authenticate('google', { scope: ['profile']})
 );
 
 
