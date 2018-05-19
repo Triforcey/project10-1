@@ -1,5 +1,7 @@
-import {googleOAuthkeys} from "./keys";
-const keys = require(googleOAuthkeys);
+const keys = {
+  clientID: process.env.GOOGLE_ID,
+  clientSecret: process.env.GOOGLE_SECRET
+};
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -37,12 +39,12 @@ passport.use(
     function(accessToken, refreshToken, profile, cb) {
         console.log('test');
         console.log(profile);
-        User.findOrCreate({ googleId: profile.id }, function (err, user) {
+        /*User.findOrCreate({ googleId: profile.id }, function (err, user) {
             console.log(profile.emails[0].value);
             userid = profile.id;
             return cb(err, user);
 
-        });
+        });*/
     }
 ));
 
@@ -55,15 +57,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.get('/', (req, res) =>{
     res.render('index');
 });
-app.get('/loggedIn', (req, res) =>{
-    console.log(userid);
-    console.log(req.user);
-    res.redirect('/');
-});
+app.get('/loggedIn', passport.authenticate('google', {
+  failureDirect: '/login'
+}));
 
 app.get('/login',
     passport.authenticate('google', { scope: ['profile']})
-
 );
 
 
