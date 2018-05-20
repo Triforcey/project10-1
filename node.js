@@ -12,7 +12,7 @@ const url = 'mongodb://localhost:27017';
 const dbName = 'toDoList';
 
 
-let app =  express();
+let app = express();
 
 
 app.use(express.static('./views'));
@@ -32,98 +32,80 @@ let bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
 app.use(express.static("public"));
-app.use(session({ secret: "cats" }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(session({
+  secret: "cats"
+}));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
 let userId;
 MongoClient.connect(url, function(err, client) {
-    const db = client.db(dbName);
-    const userCollection = db.collection('users');
+  const db = client.db(dbName);
+  const userCollection = db.collection('users');
 
-    passport.serializeUser(function(user, done) {
-        done(null, user.id);
-    });
+  passport.serializeUser((user, done) => done(null, user.id));
 
-    passport.deserializeUser(function(id, done) {
-        userCollection.find({'newUser.id': id}).toArray(function(err, docs) {
-            assert.equal(err, null);
-            userId = docs;
-            console.log(userId)
+  passport.deserializeUser(function(id, done) {
+    userCollection.findOne({
+      id: id
+    }).then(user => done(null, user));
+  });
+
+
+  passport.use(
+    new GoogleStrategy(
+      {
+        callbackURL: '/loggedIn',
+        clientID: keys.clientID,
+        clientSecret: keys.clientSecret,
+      },
+      function(accessToken, refreshToken, profile, done) {
+        userCollection.findOne({
+          id: profile.id
+        }).then(user => {
+          if (user) return done(null, user);
+          let newUser = {
+            id: profile.id,
+            todo: []
+          };
+          userCollection.save(newUser).then(() => {
+            done(null, newUser);
+          });
         });
-    });
+      }
+    )
+  );
+
+  app.get('/id', (req, res) => {
+    res.send(userid);
+  });
 
 
-    passport.use(
-        new GoogleStrategy({
-            callbackURL:'/loggedIn',
-            clientID: keys.clientID,
-            clientSecret: keys.clientSecret,
-        },
-        function(accessToken, refreshToken, profile, cb) {
-            console.log('test');
-            console.log(profile);
-            userid = profile.id;
-            console.log(userid);
+  app.get('/', (req, res) => {
+    res.render('index');
+  });
+  app.get('/loggedInList', (req, res) => {
+    res.render('index')
+  });
 
-                let newUser = profile.id;
-                assert.equal(null, err);
-                userCollection.find({"newUser.id": profile.id}).toArray(function(err, docs) {
-                    assert.equal(err, null);
-                    if(docs.length !== 0){
-                        userCollection.insertOne({newUser}, function(err, result) {
-                            assert.equal(err, null);
-                            cb(null,newUser);
-                        });
-                    }
-                    else{
-                        cb(null,docs);
-                    }
-                });
+  app.get('/loggedIn', passport.authenticate('google', {
+    successRedirect: '/loggedInList',
+    failureRedirect: '/login'
+  }));
 
-
-
-            /*User.findOrCreate({ googleId: profile.id }, function (err, user) {
-                console.log(profile.emails[0].value);
-                userid = profile.id;
-                return cb(err, user);
-
-            });*/
-        }
-    ));
-
-    app.get('/id', (req, res) =>{
-        res.send(userid);
-    });
-
-
-    app.get('/', (req, res) =>{
-        res.render('index');
-    });
-    app.get('/loggedInList', (req, res) =>{
-        res.render('index')
-    });
-    // app.get('/loggedIn', passport.authenticate('google', {
-    // //   failureDirect: '/login'
-    // // }));
-    //
-    // app.get('/loggedIn',(req,res)=>{
-    //     res.redirect('/')
-    // })
-
-    app.get('/loggedIn', passport.authenticate('google', {
-        successRedirect: '/loggedInList',
-        failureRedirect: '/login'
-    }));
-
-    app.get('/login',
-        passport.authenticate('google', { scope: ['profile'],session: false})
-    );
+  app.get('/login',
+    passport.authenticate('google', {
+      scope: ['profile'],
+      session: false
+    })
+  );
 });
 
 
 
-app.listen(port,() =>{
-    console.log(`Listening on ports ${port}`);
+app.listen(port, () => {
+  console.log(`Listening on ports ${port}`);
 });
